@@ -5,7 +5,7 @@ processes = []
 
 [env]
 DATASTORE="pinecone"
-PINECONE_ENVIRONMENT="us-east1-gcp"
+PINECONE_ENVIRONMENT="eu-west1-gcp"
 PINECONE_INDEX="fxo-indexes-prod"
 
 [experimental]
