@@ -19,14 +19,12 @@ class GetCurrentUser(HTTPBearer):
             if not token:
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
             return User(
-                token=credentials.credentials, account_id=token["accountId"], organization_id=token["organizationId"], app_role=token["appRole"]
+                token=credentials.credentials, account_id=token.get("accountId", None), organization_id=token["organizationId"], app_role=token.get("appRole",None)
             )
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
     def verify_jwt(self, jwtoken: str) -> bool:
-        isTokenValid: bool = False
-
         try:
             payload = decodeJWT(jwtoken)
         except:

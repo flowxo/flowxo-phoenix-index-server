@@ -10,7 +10,8 @@ JWT_ALGORITHM = "HS256"
 
 def decodeJWT(token: str) -> dict:
     try:
-        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], audience='flowxo')
+        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], audience='flowxo', leeway=1000)
         return decoded_token if decoded_token["exp"] >= time.time() else None
     except Exception as e:
+        print('Could not decode token:', e)
         return {}
