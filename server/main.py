@@ -4,13 +4,14 @@ from typing import Dict, Optional
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import Body, Depends, FastAPI, File, HTTPException, UploadFile
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 
 from auth.auth_bearer import GetCurrentUser
 from datastore.factory import get_datastore
-from models.api import (DeleteRequest, DeleteResponse, QueryRequest,
-                        QueryResponse, UpsertRequest, UpsertResponse, User)
+from models.api import (DeleteRequest, DeleteResponse, DocumentQueryRequest,
+                        DocumentQueryResponse, QueryRequest, QueryResponse,
+                        UpsertRequest, UpsertResponse, User)
+from services.document_query import execute_document_query
 from services.file import get_document_from_file
 
 load_dotenv()
@@ -64,7 +65,6 @@ async def upsert(
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
-
 @app.post(
     "/query",   
     response_model=QueryResponse,
@@ -78,7 +78,7 @@ async def query_main(
             request.queries,
             organization_id=user.organization_id,
             index_name=request.index_name,
-        )
+        )            
         return QueryResponse(results=results)
     except Exception as e:
         print("Error:", e)
@@ -102,6 +102,21 @@ async def query(
             index_name=request.index_name,
         )
         return QueryResponse(results=results)
+    except Exception as e:
+        print("Error:", e)
+        raise HTTPException(status_code=500, detail="Internal Service Error")
+
+@app.post(
+    "/document_query",   
+    response_model=DocumentQueryResponse,
+)
+async def document_query(
+    request: DocumentQueryRequest = Body(...),
+    user: User = Depends(GetCurrentUser()),
+):
+    try:
+        response = await execute_document_query(datastore, user, request)
+        return response
     except Exception as e:
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")

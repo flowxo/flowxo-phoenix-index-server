@@ -16,7 +16,9 @@ class DocumentMetadata(BaseModel):
     url: Optional[str] = None
     created_at: Optional[str] = None
     author: Optional[str] = None
-
+    title: Optional[str] = None
+    index_name: Optional[str] = None
+ 
 
 class DocumentChunkMetadata(DocumentMetadata):
     document_id: Optional[str] = None
@@ -65,3 +67,22 @@ class QueryWithEmbedding(Query):
 class QueryResult(BaseModel):
     query: str
     results: List[DocumentChunkWithScore]
+
+class DocumentResult(BaseModel):
+    id: str
+    metadata: DocumentMetadata
+    index_name: Optional[str] = None
+    top_score: float
+    total_score: float
+    segment_count: int
+
+class LanguageModelContext(BaseModel):
+    text: str
+    token_count: int
+
+class SourceMetadataField(str, Enum):
+    none = "none"
+    document_id = "document_id"
+    url = "url"
+    title = "title"
+    auto = "auto"
